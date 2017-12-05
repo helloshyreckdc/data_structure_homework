@@ -1,6 +1,7 @@
 package data_structure_homework;
 
 import java.awt.EventQueue;
+import java.awt.Graphics2D;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
@@ -11,6 +12,8 @@ import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class UserInterface {
 
@@ -18,7 +21,8 @@ public class UserInterface {
 	private JTextField textField;
 	private JButton btnStart;
 	private JPanel panel_1;
-
+	Graphics2D graph;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -63,16 +67,32 @@ public class UserInterface {
 		panel.add(textField);
 		textField.setColumns(10);
 		
-		btnStart = new JButton("start");
-		btnStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		panel.add(btnStart);
 		
 		panel_1 = new JPanel();
 		frame.getContentPane().add(panel_1, BorderLayout.CENTER);
+		graph = (Graphics2D) panel_1.getGraphics(); 
+		btnStart = new JButton("start");
+		panel.add(btnStart);
+		btnStart.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						graph.drawLine(100,100,200,200);
+					}
+				}).start();
+				
+			}
+		});
+		
+	
+		
 	}
+	
+	
 
 }
+
+

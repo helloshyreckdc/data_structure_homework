@@ -1,42 +1,33 @@
 package data_structure_homework;
 import java.awt.*; 
-import java.awt.event.*;
-import java.awt.geom.Line2D;
-import java.util.Random;
-
-import javax.sound.sampled.Line;
+import java.awt.event.*; 
+import java.util.Random; 
 import javax.swing.*; 
 /** 
  *  
  * @author http://javaflex.iteye.com/ 
  * 
  */ 
-public class GraphicsTest extends JFrame implements ActionListener { 
+public class TreeRecursive extends JFrame implements ActionListener { 
     public static final double PI = Math.PI / 180; 
     JPanel panel; 
     JPanel pnlCtl; 
     JButton button; 
     JButton button2; 
-    JButton btnFirstLine;
-   
     Graphics2D g2; 
  
-    public GraphicsTest(String string) { 
+    public TreeRecursive(String string) { 
         super(string); 
     } 
  
     public void init() { 
         panel = new JPanel(); 
         pnlCtl = new JPanel(); 
-        btnFirstLine = new JButton("add first line"); 
-        button = new JButton("start"); 
+        button = new JButton("tree"); 
         button2 = new JButton("clear"); 
-        
         this.add(panel, BorderLayout.CENTER); 
         button.addActionListener(this); 
         button2.addActionListener(this); 
-        btnFirstLine.addActionListener(this);
-        pnlCtl.add(btnFirstLine);
         pnlCtl.add(button); 
         pnlCtl.add(button2); 
         this.add(pnlCtl, BorderLayout.NORTH); 
@@ -53,28 +44,20 @@ public class GraphicsTest extends JFrame implements ActionListener {
             InstantiationException, IllegalAccessException, 
             UnsupportedLookAndFeelException { 
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
-        GraphicsTest testPanel = new GraphicsTest("iteration"); 
+        TreeRecursive testPanel = new TreeRecursive("tree：QQ：328247676"); 
         testPanel.init(); 
     } 
  
      
     @Override 
     public void actionPerformed(ActionEvent e) { 
-        if ("start".equals(e.getActionCommand())) { 
+        if ("tree".equals(e.getActionCommand())) { 
             drawLeaf(g2, 400, 500, 100, 210+random.nextInt(100)); 
         } else if ("clear".equals(e.getActionCommand())) { 
             panel.getGraphics().clearRect(0, 0, 800, 800); 
-        } else if ("add first line".equals(e.getActionCommand())) {
-			g2.drawLine(300, 400, 500, 400);
-			
-			
-		}
+        } 
     } 
     Random random=new Random(); 
-//    public static void drawLine(Graphics g, Line line) {
-//    	Point xPoint;
-//    	
-//	}
     public void  drawLeaf(Graphics g, double x, double y, double L, double a) { 
         //random=new Random(); 
         //可以方面速度画以了解其算法 
