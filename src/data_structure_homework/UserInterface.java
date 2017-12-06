@@ -80,7 +80,7 @@ public class UserInterface {
 
 					@Override
 					public void run() {
-						graph.drawLine(100,100,200,200);
+						//graph.drawLine(100,100,200,200);
 					}
 				}).start();
 				

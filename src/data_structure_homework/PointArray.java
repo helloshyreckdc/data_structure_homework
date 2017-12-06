@@ -3,7 +3,7 @@ package data_structure_homework;
 
 
 public class PointArray {
-	int max = 10000;
+	int max = 5000000;
 	MyPoint[] pArray = new MyPoint[max];
 	int length = 0;
 	

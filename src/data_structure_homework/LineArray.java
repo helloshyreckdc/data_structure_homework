@@ -3,7 +3,7 @@ package data_structure_homework;
 
 
 public class LineArray {
-	int max = 10000;
+	int max = 5000000;
 	MyLine[] lineArray = new MyLine[max];
 	int length = 0;
 	

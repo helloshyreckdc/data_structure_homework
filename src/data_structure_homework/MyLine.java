@@ -15,25 +15,27 @@ public class MyLine {
 	
 	public MyPoint calculateThirdPoint() {
 		MyPoint third = new MyPoint(0, 0, this.generation+1);
-		double length= Math.sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y));
+		double reverse_p1_y = 600 - p1.y;
+		double reverse_p2_y = 600 - p2.y;
+		double length= Math.sqrt((p1.x-p2.x)*(p1.x-p2.x) + (reverse_p1_y-reverse_p2_y)*(reverse_p1_y-reverse_p2_y));
 		double x_before_rotate, y_before_rotate;
 		x_before_rotate = y_before_rotate = length / 2;
 		double a, b, c, d, theta;
 		if (p1.x != p2.x) {
-			theta = Math.atan2(p2.y-p1.y, p2.x-p1.x);
+			theta = Math.atan2(reverse_p2_y-reverse_p1_y, p2.x-p1.x);
 			
-		}else if (p2.y > p1.y) {
+		}else if (reverse_p2_y > reverse_p1_y) {
 			theta = Math.PI / 2;
 		}else {
 			theta = -Math.PI / 2;
 		}
-		System.out.println(theta);
+		//System.out.println(theta);
 		a = Math.cos(theta);
 		b = -Math.sin(theta);
 		c = Math.sin(theta);
 		d = a;
 		third.x = (int) (p1.x + (a*x_before_rotate + b*y_before_rotate));
-		third.y = (int) (p1.y + (c*x_before_rotate + d*y_before_rotate));
+		third.y = 600 - (int) (reverse_p1_y + (c*x_before_rotate + d*y_before_rotate));
 		return third;
 	}
 	

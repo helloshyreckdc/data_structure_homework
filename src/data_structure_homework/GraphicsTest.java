@@ -4,119 +4,141 @@ import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.util.Random;
 
-import javax.sound.sampled.Line;
 import javax.swing.*; 
 /** 
  *  
- * @author http://javaflex.iteye.com/ 
+ * @author shyreckdc
  * 
  */ 
 public class GraphicsTest extends JFrame implements ActionListener { 
-    public static final double PI = Math.PI / 180; 
-    JPanel panel; 
-    JPanel pnlCtl; 
-    JButton button; 
-    JButton button2; 
-    JButton btnFirstLine;
-   
-    Graphics2D g2; 
- 
-    public GraphicsTest(String string) { 
-        super(string); 
-    } 
- 
-    public void init() { 
-        panel = new JPanel(); 
-        pnlCtl = new JPanel(); 
-        btnFirstLine = new JButton("add first line"); 
-        button = new JButton("start"); 
-        button2 = new JButton("clear"); 
-        
-        this.add(panel, BorderLayout.CENTER); 
-        button.addActionListener(this); 
-        button2.addActionListener(this); 
-        btnFirstLine.addActionListener(this);
-        pnlCtl.add(btnFirstLine);
-        pnlCtl.add(button); 
-        pnlCtl.add(button2); 
-        this.add(pnlCtl, BorderLayout.NORTH); 
-        setSize(800, 600); 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-        this.setVisible(true); 
-        Dimension winSize = Toolkit.getDefaultToolkit().getScreenSize(); 
-        this.setLocation((winSize.width - this.getWidth()) / 2, 
-                (winSize.height - this.getHeight()) / 2); 
-        g2 = (Graphics2D) panel.getGraphics(); 
-    } 
- 
-    public static void main(String[] args) throws ClassNotFoundException, 
-            InstantiationException, IllegalAccessException, 
-            UnsupportedLookAndFeelException { 
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
-        GraphicsTest testPanel = new GraphicsTest("iteration"); 
-        testPanel.init(); 
-    } 
- 
-     
-    @Override 
-    public void actionPerformed(ActionEvent e) { 
-        if ("start".equals(e.getActionCommand())) { 
-            drawLeaf(g2, 400, 500, 100, 210+random.nextInt(100)); 
-        } else if ("clear".equals(e.getActionCommand())) { 
-            panel.getGraphics().clearRect(0, 0, 800, 800); 
-        } else if ("add first line".equals(e.getActionCommand())) {
-			g2.drawLine(300, 400, 500, 400);
+	public static final double PI = Math.PI / 180; 
+	JPanel panel; 
+	JPanel pnlCtl; 
+	JButton btnStart; 
+	JButton btnClear; 
+	JButton btnFirstLine;
+
+	MyPoint startPoint;
+	MyPoint endPoint;
+	MyLine firstLine;
+	PointArray points = new PointArray();
+	LineArray lines = new LineArray();
+	TriangleArray triangles = new TriangleArray();
+
+	Graphics2D g2;
+	int iterateTimes = 20; // maximum is 21, if want more, data structure should be proved
+	boolean first_draw_triange = true;
+
+	public GraphicsTest(String string) { 
+		super(string); 
+	} 
+
+	public void init() { 
+		panel = new JPanel(); 
+		pnlCtl = new JPanel(); 
+		btnFirstLine = new JButton("add first line"); 
+		btnStart = new JButton("start"); 
+		btnClear = new JButton("clear"); 
+
+		this.add(panel, BorderLayout.CENTER); 
+		btnStart.addActionListener(this); 
+		btnClear.addActionListener(this); 
+		btnFirstLine.addActionListener(this);
+		pnlCtl.add(btnFirstLine);
+		pnlCtl.add(btnStart); 
+		pnlCtl.add(btnClear); 
+		this.add(pnlCtl, BorderLayout.NORTH); 
+		setSize(800, 600); 
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		this.setVisible(true); 
+		Dimension winSize = Toolkit.getDefaultToolkit().getScreenSize(); 
+		this.setLocation((winSize.width - this.getWidth()) / 2, 
+				(winSize.height - this.getHeight()) / 2); 
+		g2 = (Graphics2D) panel.getGraphics(); 
+		startPoint = new MyPoint(300, 300, 0);
+		endPoint = new MyPoint(500, 300, 0);
+		firstLine = new MyLine(startPoint, endPoint);
+		points.push(startPoint);
+		points.push(endPoint);
+		lines.push(firstLine);
+	} 
+
+	public static void main(String[] args) throws ClassNotFoundException, 
+	InstantiationException, IllegalAccessException, 
+	UnsupportedLookAndFeelException { 
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+		GraphicsTest testPanel = new GraphicsTest("iteration"); 
+		testPanel.init(); 
+	} 
+
+
+	@Override 
+	public void actionPerformed(ActionEvent e) { 
+		if ("start".equals(e.getActionCommand())) { 
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (first_draw_triange) {
+						long sysDate = System.currentTimeMillis();
+						iterate(firstLine, iterateTimes);
+						System.out.println("Time used to compute: " + (System.currentTimeMillis()-sysDate) + " milliseconds");
+						
+//						triangles.sort();
+//						System.out.println(System.currentTimeMillis()-sysDate);
+					}
+					System.out.println(points.length + " points");
+					System.out.println(lines.length + " lines");
+					System.out.println(triangles.length + " triangles");
+					first_draw_triange = false;
+					drawTriangles(g2, triangles);
+				}
+			}).start();
 			
-			
+		} else if ("clear".equals(e.getActionCommand())) { 
+			panel.getGraphics().clearRect(0, 0, 800, 800); 
+		} else if ("add first line".equals(e.getActionCommand())) {
+			drawLine(g2, firstLine);
+
+
 		}
-    } 
-    Random random=new Random(); 
-//    public static void drawLine(Graphics g, Line line) {
-//    	Point xPoint;
-//    	
-//	}
-    public void  drawLeaf(Graphics g, double x, double y, double L, double a) { 
-        //random=new Random(); 
-        //可以方面速度画以了解其算法 
-//      try { 
-//          Thread.sleep(1000); 
-//      } catch (InterruptedException e) { 
-//          // TODO Auto-generated catch block 
-//          e.printStackTrace(); 
-//      } 
-        int red = random.nextInt(127); 
-        int green = random.nextInt(127); 
-        int blue = random.nextInt(127); 
-//随机颜色 
-        g.setColor(new Color(red, green, blue)); 
-        double x1, x2, x1L, x2L, x2R, x1R, y1, y2, y1L, y2L, y2R, y1R; 
-        float deflection = 50-random.nextInt(20);//侧干主干的夹角 
-        float intersection = random.nextInt(40)-20;//主干偏转角度 
-        float depth = 2+random.nextInt(2);//限制递归深度 
-        float ratio = 3f;//主干侧干长度比(可调整使其更茂密或稀疏) 
-        float ratio2 = 1.2f;//上级主干与本级主干长度比（可调整使其变高低） 
-        if (L > depth) { 
-            x2=x+L*Math.cos(a*PI); 
-            y2=y+L*Math.sin(a*PI); 
-            x2R=x2+L/ratio*Math.cos((a+deflection)*PI); 
-            y2R=y2+L/ratio*Math.sin((a+deflection)*PI); 
-            x2L=x2+L/ratio*Math.cos((a-deflection)*PI); 
-            y2L=y2+L/ratio*Math.sin((a-deflection)*PI); 
-            x1=x+L/ratio*Math.cos(a*PI); 
-            y1=y+L/ratio*Math.sin(a*PI); 
-            x1L=x1+L/ratio*Math.cos((a-deflection)*PI); 
-            y1L=y1+L/ratio*Math.sin((a-deflection)*PI); 
-            x1R=x1+L/ratio*Math.cos((a+deflection)*PI); 
-            y1R=y1+L/ratio*Math.sin((a+deflection)*PI); 
-            g.drawLine((int)x,(int)y,(int)x2,(int)y2); 
-            g.drawLine((int)x2,(int)y2,(int)x2R,(int)y2R); 
-            g.drawLine((int)x2,(int)y2,(int)x2L,(int)y2L); 
-            g.drawLine((int)x1,(int)y1,(int)x1L,(int)y1L);          g.drawLine((int)x1,(int)y1,(int)x1R,(int)y1R); 
-            drawLeaf(g,x2,y2,L/ratio2,a+intersection); 
-            drawLeaf(g,x2R,y2R,L/ratio,a+deflection); 
-            drawLeaf(g,x2L,y2L,L/ratio,a-deflection); 
-            drawLeaf(g,x1L,y1L,L/ratio,a-deflection); 
-            drawLeaf(g,x1R,y1R,L/ratio,a+deflection); 
-        } 
-    } 
+	} 
+
+	public void drawLine(Graphics g, MyLine line) {
+		g.setColor(Color.BLACK); 
+		g.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
+	}
+	
+	public void drawTriangles(Graphics g, TriangleArray tArray) {
+		int iterationTimes = 0;
+		for (int i = 0; i < tArray.length; i++) {
+			if (tArray.triangleArray[i].generation != iterationTimes) {
+				iterationTimes = tArray.triangleArray[i].generation;
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			tArray.triangleArray[i].fillTriangle(g);
+		}
+	}
+
+
+
+	public void  iterate(MyLine line, int total) { 
+		if (line.generation < total) {
+			MyPoint third = line.calculateThirdPoint();
+			points.push(third);
+			MyLine line1 = new MyLine(line.p1, third);
+			MyLine line2 = new MyLine(third, line.p2);
+			lines.push(line1);
+			lines.push(line2);
+			MyTriangle triangle = new MyTriangle(line.p1, third, line.p2);
+			triangles.push(triangle);
+			iterate(line1, total);
+			iterate(line2, total);
+		}
+	} 
 } 
