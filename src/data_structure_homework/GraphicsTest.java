@@ -17,6 +17,12 @@ public class GraphicsTest extends JFrame implements ActionListener {
 	JButton btnStart; 
 	JButton btnClear; 
 	JButton btnFirstLine;
+	JLabel prompt;
+	JLabel prompt2;
+	JTextField textFieldX;
+	JTextField textFieldY;
+	JTextField textFieldTheta;
+	JTextField textFieldIteration;
 
 	MyPoint startPoint;
 	MyPoint endPoint;
@@ -35,16 +41,38 @@ public class GraphicsTest extends JFrame implements ActionListener {
 
 	public void init() { 
 		panel = new JPanel(); 
-		pnlCtl = new JPanel(); 
+		pnlCtl = new JPanel();
+		
+		prompt = new JLabel("Input integer x, y, theta(in degree):");
+		prompt2 = new JLabel("	Please input iteration times: ");
+		textFieldX = new JTextField();
+		textFieldX.setText("300");
+		textFieldY = new JTextField();
+		textFieldY.setText("300");
+		textFieldTheta = new JTextField();
+		textFieldTheta.setText("0");
+		textFieldTheta.setColumns(2);
+		textFieldIteration = new JTextField();
+		textFieldIteration.setText("20");
+		
 		btnFirstLine = new JButton("add first line"); 
 		btnStart = new JButton("start"); 
 		btnClear = new JButton("clear"); 
+		
+		btnStart.setEnabled(false);
 
 		this.add(panel, BorderLayout.CENTER); 
 		btnStart.addActionListener(this); 
 		btnClear.addActionListener(this); 
 		btnFirstLine.addActionListener(this);
+		pnlCtl.add(prompt);
+		pnlCtl.add(textFieldX);
+		pnlCtl.add(textFieldY);
+		pnlCtl.add(textFieldTheta);
 		pnlCtl.add(btnFirstLine);
+		pnlCtl.add(prompt2);
+		pnlCtl.add(textFieldIteration);
+		pnlCtl.add(btnStart); 
 		pnlCtl.add(btnStart); 
 		pnlCtl.add(btnClear); 
 		this.add(pnlCtl, BorderLayout.NORTH); 
@@ -55,12 +83,7 @@ public class GraphicsTest extends JFrame implements ActionListener {
 		this.setLocation((winSize.width - this.getWidth()) / 2, 
 				(winSize.height - this.getHeight()) / 2); 
 		g2 = (Graphics2D) panel.getGraphics(); 
-		startPoint = new MyPoint(300, 300, 0);
-		endPoint = new MyPoint(500, 300, 0);
-		firstLine = new MyLine(startPoint, endPoint);
-		points.push(startPoint);
-		points.push(endPoint);
-		lines.push(firstLine);
+		
 	} 
 
 	public static void main(String[] args) throws ClassNotFoundException, 
@@ -75,6 +98,9 @@ public class GraphicsTest extends JFrame implements ActionListener {
 	@Override 
 	public void actionPerformed(ActionEvent e) { 
 		if ("start".equals(e.getActionCommand())) { 
+			
+			btnFirstLine.setEnabled(false);
+			iterateTimes = Integer.parseInt(textFieldIteration.getText());
 			new Thread(new Runnable() {
 
 				@Override
@@ -97,8 +123,29 @@ public class GraphicsTest extends JFrame implements ActionListener {
 			
 		} else if ("clear".equals(e.getActionCommand())) { 
 			panel.getGraphics().clearRect(0, 0, 800, 800); 
+			btnFirstLine.setEnabled(true);
+			
+			
 		} else if ("add first line".equals(e.getActionCommand())) {
+			int x = Integer.parseInt(textFieldX.getText());
+			int y = Integer.parseInt(textFieldY.getText());
+			startPoint = new MyPoint(x, y, 0); 
+			double theta = Integer.parseInt(textFieldTheta.getText()) / 180.0 * Math.PI;
+			int deltaX = (int) (200 * Math.cos(theta));
+			int deltaY = (int) (200 * Math.sin(theta));
+			endPoint = new MyPoint(x + deltaX, y - deltaY, 0);
+			firstLine = new MyLine(startPoint, endPoint);
+			points.push(startPoint);
+			points.push(endPoint);
+			lines.push(firstLine);
 			drawLine(g2, firstLine);
+			first_draw_triange = true;
+			btnStart.setEnabled(true);
+			points = new PointArray();
+			lines = new LineArray();
+			triangles = new TriangleArray();
+			
+
 
 
 		}
