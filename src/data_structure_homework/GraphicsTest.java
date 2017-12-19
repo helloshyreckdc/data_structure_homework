@@ -2,8 +2,12 @@ package data_structure_homework;
 import java.awt.*; 
 import java.awt.event.*;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.*; 
 /** 
  *  
@@ -17,6 +21,7 @@ public class GraphicsTest extends JFrame implements ActionListener {
 	JButton btnStart; 
 	JButton btnClear; 
 	JButton btnFirstLine;
+	JButton btnSavePicture;
 	JLabel prompt;
 	JLabel prompt2;
 	JTextField textFieldX;
@@ -31,6 +36,7 @@ public class GraphicsTest extends JFrame implements ActionListener {
 	LineArray lines = new LineArray();
 	TriangleArray triangles = new TriangleArray();
 
+	private String path = System.getProperty("user.dir");  
 	Graphics2D g2;
 	int iterateTimes = 20; // maximum is 21, if want more, data structure should be proved
 	boolean first_draw_triange = true;
@@ -42,9 +48,9 @@ public class GraphicsTest extends JFrame implements ActionListener {
 	public void init() { 
 		panel = new JPanel(); 
 		pnlCtl = new JPanel();
-		
+
 		prompt = new JLabel("Input integer x, y, theta(in degree):");
-		prompt2 = new JLabel("	Please input iteration times: ");
+		prompt2 = new JLabel("	Input iteration times: ");
 		textFieldX = new JTextField();
 		textFieldX.setText("300");
 		textFieldY = new JTextField();
@@ -54,16 +60,18 @@ public class GraphicsTest extends JFrame implements ActionListener {
 		textFieldTheta.setColumns(2);
 		textFieldIteration = new JTextField();
 		textFieldIteration.setText("20");
-		
-		btnFirstLine = new JButton("add first line"); 
+
+		btnFirstLine = new JButton("addLine"); 
 		btnStart = new JButton("start"); 
 		btnClear = new JButton("clear"); 
-		
+		btnSavePicture = new JButton("save");
+
 		btnStart.setEnabled(false);
 
 		this.add(panel, BorderLayout.CENTER); 
 		btnStart.addActionListener(this); 
 		btnClear.addActionListener(this); 
+		btnSavePicture.addActionListener(this);
 		btnFirstLine.addActionListener(this);
 		pnlCtl.add(prompt);
 		pnlCtl.add(textFieldX);
@@ -75,6 +83,7 @@ public class GraphicsTest extends JFrame implements ActionListener {
 		pnlCtl.add(btnStart); 
 		pnlCtl.add(btnStart); 
 		pnlCtl.add(btnClear); 
+		pnlCtl.add(btnSavePicture);
 		this.add(pnlCtl, BorderLayout.NORTH); 
 		setSize(800, 600); 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -82,8 +91,10 @@ public class GraphicsTest extends JFrame implements ActionListener {
 		Dimension winSize = Toolkit.getDefaultToolkit().getScreenSize(); 
 		this.setLocation((winSize.width - this.getWidth()) / 2, 
 				(winSize.height - this.getHeight()) / 2); 
+
+ 
 		g2 = (Graphics2D) panel.getGraphics(); 
-		
+
 	} 
 
 	public static void main(String[] args) throws ClassNotFoundException, 
@@ -98,7 +109,7 @@ public class GraphicsTest extends JFrame implements ActionListener {
 	@Override 
 	public void actionPerformed(ActionEvent e) { 
 		if ("start".equals(e.getActionCommand())) { 
-			
+
 			btnFirstLine.setEnabled(false);
 			iterateTimes = Integer.parseInt(textFieldIteration.getText());
 			new Thread(new Runnable() {
@@ -109,9 +120,9 @@ public class GraphicsTest extends JFrame implements ActionListener {
 						long sysDate = System.currentTimeMillis();
 						iterate(firstLine, iterateTimes);
 						System.out.println("Time used to compute: " + (System.currentTimeMillis()-sysDate) + " milliseconds");
-						
-//						triangles.sort();
-//						System.out.println(System.currentTimeMillis()-sysDate);
+
+						//						triangles.sort();
+						//						System.out.println(System.currentTimeMillis()-sysDate);
 					}
 					System.out.println(points.length + " points");
 					System.out.println(lines.length + " lines");
@@ -120,32 +131,38 @@ public class GraphicsTest extends JFrame implements ActionListener {
 					drawTriangles(g2, triangles);
 				}
 			}).start();
-			
+
 		} else if ("clear".equals(e.getActionCommand())) { 
 			panel.getGraphics().clearRect(0, 0, 800, 800); 
 			btnFirstLine.setEnabled(true);
+
+
+		} else if ("save".equals(e.getActionCommand())) {
+			savePic(path);
 			
-			
-		} else if ("add first line".equals(e.getActionCommand())) {
+		} else if ("addLine".equals(e.getActionCommand())) {
 			int x = Integer.parseInt(textFieldX.getText());
 			int y = Integer.parseInt(textFieldY.getText());
-			startPoint = new MyPoint(x, y, 0); 
-			double theta = Integer.parseInt(textFieldTheta.getText()) / 180.0 * Math.PI;
-			int deltaX = (int) (200 * Math.cos(theta));
-			int deltaY = (int) (200 * Math.sin(theta));
-			endPoint = new MyPoint(x + deltaX, y - deltaY, 0);
-			firstLine = new MyLine(startPoint, endPoint);
-			points.push(startPoint);
-			points.push(endPoint);
-			lines.push(firstLine);
-			drawLine(g2, firstLine);
-			first_draw_triange = true;
-			btnStart.setEnabled(true);
-			points = new PointArray();
-			lines = new LineArray();
-			triangles = new TriangleArray();
-			
-
+			if (x<800 && x>0 && y<600 && y>0) {
+				startPoint = new MyPoint(x, y, 0); 
+				double theta = Integer.parseInt(textFieldTheta.getText()) / 180.0 * Math.PI;
+				int deltaX = (int) (200 * Math.cos(theta));
+				int deltaY = (int) (200 * Math.sin(theta));
+				endPoint = new MyPoint(x + deltaX, y - deltaY, 0);
+				firstLine = new MyLine(startPoint, endPoint);
+				points.push(startPoint);
+				points.push(endPoint);
+				lines.push(firstLine);
+				drawLine(g2, firstLine);
+				first_draw_triange = true;
+				btnStart.setEnabled(true);
+				points = new PointArray();
+				lines = new LineArray();
+				triangles = new TriangleArray();
+				
+			} else {
+				JOptionPane.showMessageDialog(null, "can't create line", "error message", JOptionPane.ERROR_MESSAGE);
+			}
 
 
 		}
@@ -155,7 +172,7 @@ public class GraphicsTest extends JFrame implements ActionListener {
 		g.setColor(Color.BLACK); 
 		g.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
 	}
-	
+
 	public void drawTriangles(Graphics g, TriangleArray tArray) {
 		int iterationTimes = 0;
 		for (int i = 0; i < tArray.length; i++) {
@@ -188,4 +205,18 @@ public class GraphicsTest extends JFrame implements ActionListener {
 			iterate(line2, total);
 		}
 	} 
+	
+	public void savePic(String path){  
+        BufferedImage myImage = null;  
+        Dimension winSize = Toolkit.getDefaultToolkit().getScreenSize(); 
+        try {  
+            myImage = new Robot().createScreenCapture(  
+                    new Rectangle((int) this.bounds().getX(), (int) this.bounds().getY()+35, panel.getWidth(), panel.getHeight()));  
+            ImageIO.write(myImage, "jpg", new File(path + "/picture"));  
+        } catch (AWTException e) {  
+            e.printStackTrace();  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+    }  
 } 
